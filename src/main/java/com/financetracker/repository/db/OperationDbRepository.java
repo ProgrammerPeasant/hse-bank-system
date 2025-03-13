@@ -20,7 +20,6 @@ public class OperationDbRepository implements OperationRepositoryInterface {
         if (operation.getId() == null) {
             operation.setId(idSequence++);
         }
-        // Создаем глубокую копию для имитации сохранения в БД
         Operation savedOperation = Operation.builder()
                 .id(operation.getId())
                 .type(operation.getType())
