@@ -2,10 +2,12 @@ package com.financetracker.console;
 
 import com.financetracker.facade.FinanceTrackerFacade;
 import com.financetracker.model.*;
+import com.financetracker.visitor.FileExportVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -95,7 +97,29 @@ public class ConsoleApplication implements CommandLineRunner {
                     analyzeData();
                     break;
                 case 5:
-                    // importExportData(); TODO - implement this method
+                    try {
+                        FileExportVisitor fileExportVisitor = new FileExportVisitor("export.txt");
+                        List<BankAccount> accounts = facade.getAllBankAccounts();
+                        List<Category> categories = facade.getAllCategories();
+                        List<Operation> operations = facade.getAllOperations();
+
+                        for (BankAccount account : accounts) {
+                            account.accept(fileExportVisitor);
+                        }
+
+                        for (Category category : categories) {
+                            category.accept(fileExportVisitor);
+                        }
+
+                        for (Operation operation : operations) {
+                            operation.accept(fileExportVisitor);
+                        }
+
+                        fileExportVisitor.close();
+                        System.out.println("Данные успешно экспортированы в файл export.txt");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case 0:
                     System.out.println("Выход из программы...");
@@ -108,34 +132,30 @@ public class ConsoleApplication implements CommandLineRunner {
     }
 
     private void printHeader() {
-        System.out.println("      СИСТЕМА УЧЕТА ФИНАНСОВ - ВЕРСИЯ 1.0        ");
-        System.out.println("=================================================");
-        System.out.println(" Текущая дата: 2025-03-13 18:34:24               ");
-        System.out.println(" Пользователь: ProgrammerPeasant                 ");
+        System.out.println("      СИСТЕМА УЧЕТА ФИНАНСОВ      ");
         System.out.println("=================================================");
     }
 
     private void initializeSampleData() {
-        // Создаем демонстрационные данные для примера
         if (facade.getAllBankAccounts().isEmpty()) {
             System.out.println("Инициализация демонстрационных данных...");
 
-            // Создаем счета
+            // Создаю счета
             BankAccount mainAccount = facade.createBankAccount("Основной счет", 100000.0);
             BankAccount savingsAccount = facade.createBankAccount("Сберегательный счет", 50000.0);
 
-            // Создаем категории доходов
+            // Создаю категории доходов
             Category salary = facade.createCategory(CategoryType.INCOME, "Зарплата");
             Category interest = facade.createCategory(CategoryType.INCOME, "Проценты по вкладу");
             Category gifts = facade.createCategory(CategoryType.INCOME, "Подарки");
 
-            // Создаем категории расходов
+            // Создаю категории расходов
             Category food = facade.createCategory(CategoryType.EXPENSE, "Продукты");
             Category entertainment = facade.createCategory(CategoryType.EXPENSE, "Развлечения");
             Category transport = facade.createCategory(CategoryType.EXPENSE, "Транспорт");
             Category utilities = facade.createCategory(CategoryType.EXPENSE, "Коммунальные услуги");
 
-            // Создаем операции
+            // Создаю операции
             facade.createIncomeOperation(mainAccount.getId(), 80000.0, LocalDate.of(2025, 2, 10),
                     "Зарплата за февраль", salary.getId());
             facade.createIncomeOperation(savingsAccount.getId(), 1500.0, LocalDate.of(2025, 2, 15),
@@ -151,8 +171,6 @@ public class ConsoleApplication implements CommandLineRunner {
                     "Проездной билет", transport.getId());
             facade.createExpenseOperation(mainAccount.getId(), 8000.0, LocalDate.of(2025, 3, 5),
                     "Оплата счетов за коммунальные услуги", utilities.getId());
-
-            System.out.println("Демонстрационные данные созданы успешно!");
         }
     }
 
@@ -285,8 +303,6 @@ public class ConsoleApplication implements CommandLineRunner {
 
     // ============== КАТЕГОРИИ ==============
 
-    // ============== КАТЕГОРИИ ==============
-
     private void manageCategories() {
         boolean running = true;
         while (running) {
@@ -346,7 +362,6 @@ public class ConsoleApplication implements CommandLineRunner {
         }
 
         System.out.printf("%-5s | %-10s | %-30s\n", "ID", "Тип", "Название");
-        System.out.println("------------------------------------------------------");
 
         for (Category category : categories) {
             String typeStr = (category.getType() == CategoryType.INCOME) ? "Доход" : "Расход";
@@ -453,7 +468,6 @@ public class ConsoleApplication implements CommandLineRunner {
         String operationTypeStr = (type == OperationType.INCOME) ? "ДОХОДА" : "РАСХОДА";
         System.out.println("\n--- СОЗДАНИЕ НОВОЙ ОПЕРАЦИИ " + operationTypeStr + " ---");
 
-        // Выбор счета
         viewAllBankAccounts();
         long accountId = readLongInput("Введите ID счета: ");
         BankAccount account = facade.getBankAccountById(accountId);
@@ -462,7 +476,6 @@ public class ConsoleApplication implements CommandLineRunner {
             return;
         }
 
-        // Выбор категории
         System.out.println("Доступные категории " + operationTypeStr.toLowerCase() + ":");
         List<Category> categories = facade.getCategoriesByType(
                 (type == OperationType.INCOME) ? CategoryType.INCOME : CategoryType.EXPENSE
@@ -488,14 +501,12 @@ public class ConsoleApplication implements CommandLineRunner {
             return;
         }
 
-        // Ввод суммы
         double amount = readDoubleInput("Введите сумму: ");
         if (amount <= 0) {
             System.out.println("Сумма должна быть положительной.");
             return;
         }
 
-        // Ввод даты
         String dateStr = readStringInput("Введите дату (формат: yyyy-MM-dd): ");
         LocalDate date;
         try {
@@ -505,10 +516,8 @@ public class ConsoleApplication implements CommandLineRunner {
             return;
         }
 
-        // Описание
         String description = readStringInput("Введите описание операции: ");
 
-        // Создание операции
         Operation operation;
         if (type == OperationType.INCOME) {
             operation = facade.createIncomeOperation(accountId, amount, date, description, categoryId);
