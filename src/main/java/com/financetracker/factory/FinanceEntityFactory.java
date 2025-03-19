@@ -4,6 +4,7 @@ import com.financetracker.model.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Component
 public class FinanceEntityFactory {
@@ -25,6 +26,7 @@ public class FinanceEntityFactory {
     public Operation createIncomeOperation(Long bankAccountId, double amount, LocalDate date,
                                            String description, Long categoryId) {
         return Operation.builder()
+                //.id(UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE)
                 .type(OperationType.INCOME)
                 .bankAccountId(bankAccountId)
                 .amount(amount)
