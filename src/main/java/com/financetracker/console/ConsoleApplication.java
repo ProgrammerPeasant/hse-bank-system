@@ -66,9 +66,6 @@ public class ConsoleApplication implements CommandLineRunner {
 
     protected final FinanceTrackerFacadeInterface facade;
     private final Scanner scanner;
-//
-//    private final FinanceTrackerFacade facade;
-//    private final Scanner scanner;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
@@ -98,9 +95,6 @@ public class ConsoleApplication implements CommandLineRunner {
                     manageOperations();
                     break;
                 case 4:
-                    analyzeData();
-                    break;
-                case 5:
                     try {
                         FileExportVisitor fileExportVisitor = new FileExportVisitor("export.txt");
                         List<BankAccount> accounts = facade.getAllBankAccounts();
@@ -137,29 +131,24 @@ public class ConsoleApplication implements CommandLineRunner {
 
     private void printHeader() {
         System.out.println("      СИСТЕМА УЧЕТА ФИНАНСОВ      ");
-        System.out.println("=================================================");
     }
 
     protected void initializeSampleData() {
         if (facade.getAllBankAccounts().isEmpty()) {
             System.out.println("Инициализация демонстрационных данных...");
 
-            // Создаю счета
             BankAccount mainAccount = facade.createBankAccount("Основной счет", 100000.0);
             BankAccount savingsAccount = facade.createBankAccount("Сберегательный счет", 50000.0);
 
-            // Создаю категории доходов
             Category salary = facade.createCategory(CategoryType.INCOME, "Зарплата");
             Category interest = facade.createCategory(CategoryType.INCOME, "Проценты по вкладу");
             Category gifts = facade.createCategory(CategoryType.INCOME, "Подарки");
 
-            // Создаю категории расходов
             Category food = facade.createCategory(CategoryType.EXPENSE, "Продукты");
             Category entertainment = facade.createCategory(CategoryType.EXPENSE, "Развлечения");
             Category transport = facade.createCategory(CategoryType.EXPENSE, "Транспорт");
             Category utilities = facade.createCategory(CategoryType.EXPENSE, "Коммунальные услуги");
 
-            // Создаю операции
             facade.createIncomeOperation(mainAccount.getId(), 80000.0, LocalDate.of(2025, 2, 10),
                     "Зарплата за февраль", salary.getId());
             facade.createIncomeOperation(savingsAccount.getId(), 1500.0, LocalDate.of(2025, 2, 15),
@@ -183,12 +172,9 @@ public class ConsoleApplication implements CommandLineRunner {
         System.out.println("1. Управление банковскими счетами");
         System.out.println("2. Управление категориями");
         System.out.println("3. Управление операциями");
-        System.out.println("4. Аналитика");
-        System.out.println("5. Импорт/Экспорт данных");
+        System.out.println("4. Импорт/Экспорт данных");
         System.out.println("0. Выход");
     }
-
-    // ============== БАНКОВСКИЕ СЧЕТА ==============
 
     private void manageBankAccounts() {
         boolean running = true;
@@ -225,7 +211,6 @@ public class ConsoleApplication implements CommandLineRunner {
     }
 
     private void createBankAccount() {
-        System.out.println("\n--- СОЗДАНИЕ НОВОГО СЧЕТА ---");
         String name = readStringInput("Введите название счета: ");
         double initialBalance = readDoubleInput("Введите начальный баланс: ");
 
@@ -234,7 +219,6 @@ public class ConsoleApplication implements CommandLineRunner {
     }
 
     private void viewAllBankAccounts() {
-        System.out.println("\n--- СПИСОК ВСЕХ СЧЕТОВ ---");
         List<BankAccount> accounts = facade.getAllBankAccounts();
 
         if (accounts.isEmpty()) {
@@ -254,7 +238,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void editBankAccount() {
         viewAllBankAccounts();
 
-        System.out.println("\n--- РЕДАКТИРОВАНИЕ СЧЕТА ---");
         long id = readLongInput("Введите ID счета для редактирования (0 для отмены): ");
 
         if (id == 0) {
@@ -281,7 +264,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void deleteBankAccount() {
         viewAllBankAccounts();
 
-        System.out.println("\n--- УДАЛЕНИЕ СЧЕТА ---");
         long id = readLongInput("Введите ID счета для удаления (0 для отмены): ");
 
         if (id == 0) {
@@ -342,7 +324,6 @@ public class ConsoleApplication implements CommandLineRunner {
     }
 
     private void createCategory() {
-        System.out.println("\n--- СОЗДАНИЕ НОВОЙ КАТЕГОРИИ ---");
         System.out.println("Выберите тип категории:");
         System.out.println("1. Доход");
         System.out.println("2. Расход");
@@ -377,7 +358,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void editCategory() {
         viewAllCategories();
 
-        System.out.println("\n--- РЕДАКТИРОВАНИЕ КАТЕГОРИИ ---");
         long id = readLongInput("Введите ID категории для редактирования (0 для отмены): ");
 
         if (id == 0) {
@@ -404,7 +384,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void deleteCategory() {
         viewAllCategories();
 
-        System.out.println("\n--- УДАЛЕНИЕ КАТЕГОРИИ ---");
         long id = readLongInput("Введите ID категории для удаления (0 для отмены): ");
 
         if (id == 0) {
@@ -492,7 +471,6 @@ public class ConsoleApplication implements CommandLineRunner {
         }
 
         System.out.printf("%-5s | %-30s\n", "ID", "Название");
-        System.out.println("--------------------------------------");
         for (Category category : categories) {
             System.out.printf("%-5d | %-30s\n", category.getId(), category.getName());
         }
@@ -547,7 +525,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void viewOperationsByAccount() {
         viewAllBankAccounts();
 
-        System.out.println("\n--- ПРОСМОТР ОПЕРАЦИЙ ПО СЧЕТУ ---");
         long accountId = readLongInput("Введите ID счета (0 для отмены): ");
 
         if (accountId == 0) {
@@ -574,7 +551,6 @@ public class ConsoleApplication implements CommandLineRunner {
     private void deleteOperation() {
         viewAllOperations();
 
-        System.out.println("\n--- УДАЛЕНИЕ ОПЕРАЦИИ ---");
         long id = readLongInput("Введите ID операции для удаления (0 для отмены): ");
 
         if (id == 0) {
@@ -613,42 +589,6 @@ public class ConsoleApplication implements CommandLineRunner {
             System.out.printf("%-5d | %-10s | %-12s | %-15.2f | %-30s | %-20s\n",
                     operation.getId(), typeStr, operation.getDate(),
                     operation.getAmount(), operation.getDescription(), categoryName);
-        }
-    }
-
-    // ============== АНАЛИТИКА ==============
-
-    private void analyzeData() {
-        boolean running = true;
-        while (running) {
-            System.out.println("\nАНАЛИТИКА:");
-            System.out.println("1. Разница доходов и расходов за период");
-            System.out.println("2. Группировка доходов по категориям");
-            System.out.println("3. Группировка расходов по категориям");
-            System.out.println("4. Статистика операций");
-            System.out.println("0. Вернуться в главное меню");
-
-            int choice = readIntInput(CHOOSE_OPTION);
-
-            switch (choice) {
-                case 1:
-                    // analyzeIncomeExpenseDifference();
-                    break;
-                case 2:
-                    // analyzeIncomeByCategories();
-                    break;
-                case 3:
-                    // analyzeExpenseByCategories();
-                    break;
-                case 4:
-                    // showOperationsStatistics();
-                    break;
-                case 0:
-                    running = false;
-                    break;
-                default:
-                    System.out.println(WRONG_OPTION);
-            }
         }
     }
 }
