@@ -64,7 +64,7 @@ public class ConsoleApplication implements CommandLineRunner {
         }
     }
 
-    private final FinanceTrackerFacadeInterface facade;
+    protected final FinanceTrackerFacadeInterface facade;
     private final Scanner scanner;
 //
 //    private final FinanceTrackerFacade facade;
@@ -140,7 +140,7 @@ public class ConsoleApplication implements CommandLineRunner {
         System.out.println("=================================================");
     }
 
-    private void initializeSampleData() {
+    protected void initializeSampleData() {
         if (facade.getAllBankAccounts().isEmpty()) {
             System.out.println("Инициализация демонстрационных данных...");
 

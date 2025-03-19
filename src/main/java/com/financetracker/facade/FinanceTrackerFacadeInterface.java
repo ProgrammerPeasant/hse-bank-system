@@ -5,17 +5,18 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface FinanceTrackerFacadeInterface {
+
     BankAccount createBankAccount(String name, double initialBalance);
     BankAccount getBankAccountById(Long id);
     List<BankAccount> getAllBankAccounts();
-    BankAccount updateBankAccount(BankAccount bankAccount);
+    void updateBankAccount(BankAccount bankAccount);
     void deleteBankAccount(Long id);
 
     Category createCategory(CategoryType type, String name);
     Category getCategoryById(Long id);
     List<Category> getAllCategories();
     List<Category> getCategoriesByType(CategoryType type);
-    Category updateCategory(Category category);
+    void updateCategory(Category category);
     void deleteCategory(Long id);
 
     Operation createIncomeOperation(Long bankAccountId, double amount, LocalDate date, String description, Long categoryId);

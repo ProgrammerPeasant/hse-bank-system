@@ -55,8 +55,8 @@ public class FinanceTrackerFacade implements FinanceTrackerFacadeInterface {
         return bankAccountRepository.findAll();
     }
 
-    public BankAccount updateBankAccount(BankAccount account) {
-        return bankAccountRepository.save(account);
+    public void updateBankAccount(BankAccount account) {
+        bankAccountRepository.save(account);
     }
 
     public void deleteBankAccount(Long id) {
@@ -83,8 +83,8 @@ public class FinanceTrackerFacade implements FinanceTrackerFacadeInterface {
         return categoryRepository.findByType(type);
     }
 
-    public Category updateCategory(Category category) {
-        return categoryRepository.save(category);
+    public void updateCategory(Category category) {
+        categoryRepository.save(category);
     }
 
     public void deleteCategory(Long id) {
