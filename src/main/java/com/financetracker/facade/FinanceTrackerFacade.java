@@ -20,7 +20,7 @@ import java.util.Optional;
  * к набору интерфейсов в системе.
  */
 @Service
-public class FinanceTrackerFacade {
+public class FinanceTrackerFacade implements FinanceTrackerFacadeInterface {
 
     private final BankAccountRepositoryInterface bankAccountRepository;
     private final CategoryRepositoryInterface categoryRepository;
@@ -136,9 +136,6 @@ public class FinanceTrackerFacade {
         operationRepository.deleteById(id);
     }
 
-    // --------------- Аналитика ---------------
-
-    // --------------- Статистика ---------------
 
     // --------------- Пересчет баланса ---------------
 
