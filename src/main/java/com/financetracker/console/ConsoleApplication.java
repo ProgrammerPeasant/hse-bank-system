@@ -1,6 +1,7 @@
 package com.financetracker.console;
 
 import com.financetracker.facade.FinanceTrackerFacade;
+import com.financetracker.facade.FinanceTrackerFacadeInterface;
 import com.financetracker.model.*;
 import com.financetracker.visitor.FileExportVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,11 @@ public class ConsoleApplication implements CommandLineRunner {
         }
     }
 
-    private final FinanceTrackerFacade facade;
+    private final FinanceTrackerFacadeInterface facade;
     private final Scanner scanner;
+//
+//    private final FinanceTrackerFacade facade;
+//    private final Scanner scanner;
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Autowired
