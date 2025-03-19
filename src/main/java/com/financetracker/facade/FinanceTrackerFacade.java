@@ -5,17 +5,12 @@ import com.financetracker.model.*;
 import com.financetracker.repository.interfaces.BankAccountRepositoryInterface;
 import com.financetracker.repository.interfaces.CategoryRepositoryInterface;
 import com.financetracker.repository.interfaces.OperationRepositoryInterface;
-import com.financetracker.service.ExpenseOperationProcessor;
-import com.financetracker.service.IncomeOperationProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -31,22 +26,17 @@ public class FinanceTrackerFacade {
     private final CategoryRepositoryInterface categoryRepository;
     private final OperationRepositoryInterface operationRepository;
     private final FinanceEntityFactory entityFactory;
-    private final IncomeOperationProcessor incomeProcessor;
-    private final ExpenseOperationProcessor expenseProcessor;
 
     @Autowired
     public FinanceTrackerFacade(
             @Qualifier("bankAccountRepositoryProxy") BankAccountRepositoryInterface bankAccountRepository,
             @Qualifier("categoryRepositoryProxy") CategoryRepositoryInterface categoryRepository,
             @Qualifier("operationRepositoryProxy") OperationRepositoryInterface operationRepository,
-            FinanceEntityFactory entityFactory, IncomeOperationProcessor incomeProcessor,
-            ExpenseOperationProcessor expenseProcessor) {
+            FinanceEntityFactory entityFactory) {
         this.bankAccountRepository = bankAccountRepository;
         this.categoryRepository = categoryRepository;
         this.operationRepository = operationRepository;
         this.entityFactory = entityFactory;
-        this.incomeProcessor = incomeProcessor;
-        this.expenseProcessor = expenseProcessor;
     }
 
     // --------------- Банковские счета ---------------
@@ -105,14 +95,16 @@ public class FinanceTrackerFacade {
 
     public Operation createIncomeOperation(Long bankAccountId, double amount, LocalDate date,
                                            String description, Long categoryId) {
-        return entityFactory.createIncomeOperation(
+        Operation operation = entityFactory.createIncomeOperation(
                 bankAccountId, amount, date, description, categoryId);
+        return operationRepository.save(operation);
     }
 
     public Operation createExpenseOperation(Long bankAccountId, double amount, LocalDate date,
                                             String description, Long categoryId) {
-        return entityFactory.createExpenseOperation(
+        Operation operation = entityFactory.createExpenseOperation(
                 bankAccountId, amount, date, description, categoryId);
+        return operationRepository.save(operation);
     }
 
     public Operation getOperationById(Long id) {
@@ -146,12 +138,7 @@ public class FinanceTrackerFacade {
 
     // --------------- Аналитика ---------------
 
-
-    // --------------- Импорт/Экспорт ---------------
-
-
     // --------------- Статистика ---------------
-
 
     // --------------- Пересчет баланса ---------------
 
